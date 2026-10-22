@@ -1,0 +1,33 @@
+Conferencia de Cargas v1.0.18 - Exclusao logica e auditoria
+
+BASE: v1.0.17 (ZIP anterior), preserva a tela compacta e as abas.
+
+NOVOS METADADOS
+- datadictionary/historico.xml: AD_CONF_CARGA_HIST
+- datadictionary/leitura.xml: STATUS, CODUSUEXC, DHEXC
+
+ANTES DE TESTAR
+1. Publicar/configurar o add-on para criar a nova tabela e colunas.
+2. Conferir que AD_CONF_CARGA_LEIT.STATUS, CODUSUEXC, DHEXC e AD_CONF_CARGA_HIST existem.
+3. Executar INSTALACAO_V1.0.18.sql para criar a sequence AD_CONF_HIST_SEQ (uma unica vez).
+4. Compilar e publicar os servicos Java e o frontend.
+5. Testar em homologacao, em uma conferencia STATUS=A.
+
+FUNCIONALIDADE
+- Selecione uma linha agrupada em Leituras ja realizadas e clique Excluir selecionada.
+- Selecione a leitura individual, informe motivo obrigatorio e confirme.
+- O registro original permanece em AD_CONF_CARGA_LEIT com STATUS='E'.
+- Historico INCLUSAO/EXCLUSAO em AD_CONF_CARGA_HIST.
+- Painel mostra somente leituras com NVL(STATUS,'A')='A'.
+- Conferencia com STATUS diferente de A nao permite excluir.
+- Nao ha restauracao automatica.
+
+IMPORTANTE: conciliacao SQL externa
+A consulta de conciliacao que roda no DBExplorer nao e parte do add-on.
+Adicione AND NVL(STATUS,'A')='A' na CTE LEIT da consulta, senao ela
+continuara contando as leituras excluidas.
+
+VALIDACAO
+JavaScript: node --check passou.
+Compilacao Java: NAO validada neste ambiente (dependencias Sankhya ausentes).
+Nao aplicar em producao sem testar build e integracao na homologacao.

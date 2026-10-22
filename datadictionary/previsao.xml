@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA_PREV" sequenceType="A" sequenceField="NUPREV">
+    <description>Previsao FIFO Congelada da Conferencia</description>
+    <primaryKey><field name="NUPREV"/></primaryKey>
+    <instances><instance name="AD_ConfCargaPrev"><description>Previsao FIFO da Conferencia</description></instance></instances>
+    <fields>
+      <field name="NUPREV" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Identificador da previsao</description></field>
+      <field name="NUCONF" dataType="PESQUISA" allowSearch="S" visibleOnSearch="S" targetInstance="AD_ConfCarga" targetField="NUCONF" targetType="INTEIRO"><description>Conferencia de carga</description></field>
+      <field name="CODPROD" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Produto</description></field>
+      <field name="CONTROLE" dataType="TEXTO" size="100" allowSearch="S" visibleOnSearch="S"><description>Lote do produto</description></field>
+      <field name="CODVOL" dataType="TEXTO" size="20" allowSearch="S" visibleOnSearch="S"><description>Unidade do produto</description></field>
+      <field name="QTD_PREV" dataType="DECIMAL" nuCasasDecimais="8" allowSearch="S" visibleOnSearch="S"><description>Quantidade prevista pelo FIFO</description></field>
+    </fields>
+  </table>
+</metadados>

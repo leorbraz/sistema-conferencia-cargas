@@ -1,0 +1,5 @@
+v1.0.61 - Reconferencia automatica por produto divergente
+
+Ao solicitar RECONFERIR numa conferencia D, as leituras ativas dos produtos divergentes sao marcadas R (historico preservado), sem apagar registros. Produtos conformes continuam ativos. A previsao permanece congelada. Leituras novas sao contabilizadas normalmente.
+
+ATENCAO: A selecao dos produtos e automatica (todos os divergentes), nao manual. O bloqueio por CODUSU supervisor ainda precisa ser implementado antes de producao. Testar em homologacao, incluindo divergencia de lote, falta total, excesso e segunda reconferencia.

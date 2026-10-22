@@ -1,0 +1,38 @@
+CONFERENCIA CEGA DE CARGAS - v1.0.11 (HOMOLOGACAO)
+
+BASE: v1.0.10 comprovadamente funcional no Sankhya.
+
+O QUE MUDA
+- Novo metodo EJB ConferenciaCargaSP.iniciarConferencia (transacao Required).
+- Reaproveita exatamente a CTE FIFO da v1.0.10 para obter linhas de produto/lote/unidade.
+- Grava cabecalho AD_CONF_CARGA e previsao AD_CONF_CARGA_PREV.
+- Numero gerado por AD_CONF_CARGA_SEQ.
+- Usuario obtido da sessao autenticada do Sankhya, nunca enviado pelo navegador.
+- Bloqueia OC sem pedidos, FIFO incompleto e conferencia P/A ja existente.
+- STATUS P (PENDENTE DE VALIDACAO): nao libera leitura, nao aprova carga.
+- Nao altera pedidos, notas ou estoque.
+
+INSTALACAO EM HOMOLOGACAO
+1. FAZER BACKUP do projeto atual e do banco.
+2. Em Oracle, executar UMA VEZ implantacao_manual/01_criar_tabelas_oracle.sql
+   com usuario autorizado no mesmo schema em que o EJB acessa AD_CONF_CARGA.
+   Se as tabelas ja existirem, NAO executar o script; revisar estrutura.
+3. O projeto permanece autoDDL=true; scripts manuais estao FORA de dbscripts.
+4. Executar .\\gradlew clean gerarAddon e publicar/deploy/configure no Sankhya.
+5. Buscar empresa 53 e OC 230, validar FIFO, e clicar Iniciar Conferencia.
+6. Confirmar numero retornado e status PENDENTE_VALIDACAO.
+7. Executar 02_validar_previsao_administrativa.sql em ambiente administrativo
+   e comparar todos os itens com o romaneio impresso.
+8. Testar segunda tentativa na mesma OC: deve bloquear duplicidade.
+
+ATENCAO / LIMITACOES
+- A v1.0.10 usa saldo de estoque ATUAL, nao necessariamente o mesmo saldo
+  da hora da impressao do romaneio. Portanto status permanece P.
+- O SQL original nao restringe TIPMOV='P'; validar divergencias de documentos.
+- O SQL original pode tratar unidades mistas; bloqueio implementado no resumo.
+- Nao existe liberacao administrativa, retomada, cancelamento, historico ou
+  leitura de barras nesta versao. Nao usar para liberar cargas em producao.
+- O acesso direto as tabelas AD_CONF_CARGA_PREV deve ser restrito; nunca expor
+  dados detalhados no JavaScript da conferencia cega.
+- Erros no metodo transacional propagam excecao para rollback pelo container EJB.
+- O codigo ainda precisa de build no SDK e teste de integracao Oracle local.

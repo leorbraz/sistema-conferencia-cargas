@@ -1,0 +1,93 @@
+/*
+    Para mais informações de como efetuar a correta configuração desse arquivo,
+    consulte a documentação oficial da Sankkhya no link abaixo:
+    <a href="https://developer.sankhya.com.br/docs/03_conf_addonstudio"/>
+ */
+
+buildscript {
+
+    repositories{
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url = uri("https://artifacts-partners.sankhya.com.br/repository/maven-releases")
+        }
+    }
+
+    dependencies {
+        classpath "br.com.sankhya.studio:gradle-plugin:2+"
+        classpath "com.google.devtools.ksp:symbol-processing-gradle-plugin:2.0.0-1.0.24"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0"
+    }
+}
+
+//Substitua o valor inserido em 'group' por seu domínio, por exemplo: 'br.com.suaempresa'.
+group = 'br.com.agronorte.conferenciacargas'
+//Especifica a versão do addon. É útil para controle de versões, deploys e compatibilidade com o sistema.
+version="1.0.72"
+//Define uma breve descrição do addon, explicando sua funcionalidade ou objetivo principal.
+description = "Conferência Cega de Cargas"
+
+apply(plugin: "br.com.sankhya.addonstudio")
+snkmodule {
+    //Informe aqui o caminho de instalação do WildFly. Exemplo: C:\\wildfly_producao
+    serverFolder = '${WILDFLY_HOME}'
+    //Informe aqui a versão mínima da plataforma Sankhya que seu add-on suporta.
+    plataformaMinima = "4.28"
+}
+
+addon {
+    /*
+        Ao habilitar o autoDDL, os scripts de criação de tabelas em dbscripts são ignorados,
+        e as tabelas são geradas automaticamente com base nas entidades definidas em datadictionary*.
+        Para usar scripts manuais, defina autoDDL=false. Para mais informações, consulte:
+        <a href="https://developer.sankhya.com.br/docs/02_autoddl">
+    */
+    autoDDL=true
+    //Informe aqui a sua APPKEY. Lembre-se de criar previamente sua solução e componente no Portal do Desenvolvedor.
+    appKey="3517812b-60d4-43e1-bae8-3abcaab73c8a"
+    //Informe aqui o nome da sua empresa
+    parceiroNome = "AGRONORTE"
+}
+
+// Protecao da geracao EJB: evita publicar um pacote sem o servico remoto.
+// O XJavaDoc legado ignora fontes com timestamp posterior ao seu cache interno.
+tasks.register('prepararFonteEJB') {
+    doLast {
+        def bean = file('model/src/main/java/br/com/agronorte/conferenciacargas/services/ConferenciaCargaSPBean.java')
+        if (!bean.exists()) throw new GradleException('ConferenciaCargaSPBean.java nao encontrado')
+        // Timestamp anterior ao cache do XJavaDoc; conteudo nao e alterado.
+        bean.setLastModified(946684800000L) // 2000-01-01 UTC
+    }
+}
+
+tasks.register('validarEJBConferencia') {
+    doLast {
+        def base = file('model/ejbsrc/br/com/agronorte/conferenciacargas/services')
+        ['ConferenciaCargaSP.java','ConferenciaCargaSPHome.java','ConferenciaCargaSPSession.java'].each { nome ->
+            if (!new File(base,nome).isFile()) throw new GradleException("EJB ausente: ${nome}")
+        }
+        def descritor = file('model/build/META-INF/tinyejb-ejb-jar.xml')
+        if (!descritor.isFile() || !descritor.getText('ISO-8859-1').contains('<ejb-name>ConferenciaCargaSP</ejb-name>'))
+            throw new GradleException('XDoclet nao registrou ConferenciaCargaSP no descritor')
+        def remote = new File(base,'ConferenciaCargaSP.java').getText('UTF-8')
+        ['buscarConferencia','decidirConferencia','finalizarConferencia'].each { metodo ->
+            if (!remote.contains(metodo+'(')) throw new GradleException("Metodo remoto EJB ausente: ${metodo}")
+        }
+        println '[Conferencia Cargas] XDoclet OK: interfaces, descritor e metodos conferidos.'
+    }
+}
+
+gradle.projectsEvaluated {
+    def model = project(':model')
+    model.tasks.named('xdoclet_generation').configure {
+        dependsOn(rootProject.tasks.named('prepararFonteEJB'))
+    }
+    rootProject.tasks.named('validarEJBConferencia').configure {
+        dependsOn(model.tasks.named('xdoclet_generation'))
+    }
+    // Evita que compilacao/publicacao prossiga antes da validacao.
+    model.tasks.matching { it.name == 'compileJava' }.configureEach {
+        dependsOn(rootProject.tasks.named('validarEJBConferencia'))
+    }
+}

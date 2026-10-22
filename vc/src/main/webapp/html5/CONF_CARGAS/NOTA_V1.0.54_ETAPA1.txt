@@ -1,0 +1,4 @@
+v1.0.54 ETAPA 1 - Layout responsivo para Zebra Android.
+Alteracoes: CSS mobile, botao Abrir OC por toque e identificacao de interface.
+ATENCAO: leitura de etiqueta de doca e validacao obrigatoria no backend NAO estao implementadas nesta etapa. Nao homologar operacao no coletor como protegida ate completar o controle de acesso no servidor.
+Desktop: nenhuma regra de negocio Java alterada.

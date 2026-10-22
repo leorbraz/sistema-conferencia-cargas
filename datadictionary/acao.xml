@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA_ACAO" sequenceType="A" sequenceField="NUACAO">
+    <description>Historico das decisoes administrativas da conferencia de cargas</description>
+    <primaryKey><field name="NUACAO"/></primaryKey>
+    <instances><instance name="AD_ConfCargaAcao"><description>Decisoes administrativas da conferencia</description></instance></instances>
+    <fields>
+      <field name="NUACAO" dataType="INTEIRO"><description>Identificador da decisao</description></field>
+      <field name="NUCONF" dataType="PESQUISA" targetInstance="AD_ConfCarga" targetField="NUCONF" targetType="INTEIRO"><description>Conferencia</description></field>
+      <field name="ACAO" dataType="TEXTO" size="30"><description>VALIDAR, VALIDAR_DIVERGENTE ou RECONFERIR</description></field>
+      <field name="STATUS_ANT" dataType="TEXTO" size="1"><description>Status anterior</description></field>
+      <field name="STATUS_NOVO" dataType="TEXTO" size="1"><description>Status novo</description></field>
+      <field name="CODUSU" dataType="INTEIRO"><description>Usuario da decisao</description></field>
+      <field name="DHACAO" dataType="DATA_HORA"><description>Data e hora da decisao</description></field>
+      <field name="JUSTIFICATIVA" dataType="TEXTO" size="500"><description>Motivo da decisao</description></field>
+    </fields>
+  </table>
+</metadados>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA_LEIT" sequenceType="A" sequenceField="NULEIT">
+    <description>Leituras fisicas da conferencia cega</description>
+    <primaryKey><field name="NULEIT"/></primaryKey>
+    <instances><instance name="AD_ConfCargaLeit"><description>Leituras de Conferencia</description></instance></instances>
+    <fields>
+      <field name="NULEIT" dataType="INTEIRO"><description>Identificador da leitura</description></field>
+      <field name="NUCONF" dataType="PESQUISA" targetInstance="AD_ConfCarga" targetField="NUCONF" targetType="INTEIRO"><description>Conferencia</description></field>
+      <field name="CODPROD" dataType="INTEIRO"><description>Produto identificado</description></field>
+      <field name="CONTROLE" dataType="TEXTO" size="100"><description>Lote informado</description></field>
+      <field name="CODVOL" dataType="TEXTO" size="20"><description>Unidade</description></field>
+      <field name="CODBARRA" dataType="TEXTO" size="100"><description>Codigo lido</description></field>
+      <field name="QTD" dataType="DECIMAL" nuCasasDecimais="8"><description>Quantidade conferida</description></field>
+      <field name="CODUSU" dataType="INTEIRO"><description>Usuario da leitura</description></field>
+      <field name="DHLEITURA" dataType="DATA_HORA"><description>Data da leitura</description></field>
+      <field name="STATUS" dataType="TEXTO" size="1"><description>A ativa, E excluida, R arquivada em reconferencia; nulo legado ativo</description></field>
+      <field name="CODUSUEXC" dataType="INTEIRO"><description>Usuario da exclusao</description></field>
+      <field name="DHEXC" dataType="DATA_HORA"><description>Data e hora da exclusao</description></field>
+      <field name="IDEVENTO" dataType="TEXTO" size="80"><description>Identificador unico da requisicao</description></field>
+    </fields>
+  </table>
+</metadados>

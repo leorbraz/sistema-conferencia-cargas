@@ -1,0 +1,10 @@
+v1.0.12 - Teste controlado de leituras fisicas
+
+1. Instale os XMLs do datadictionary (inclui leitura.xml) via configureAddon.
+2. Confirme AD_CONF_CARGA_LEIT no Oracle.
+3. A conferencia #1 foi criada com STATUS=P. Para testes, APOS validar o romaneio, um administrador autorizado deve liberar a conferencia para STATUS=A. O projeto NAO aprova automaticamente.
+4. Use a tela Conferencia fisica cega: numero da conferencia, codigo de barras do produto (TGFPRO.CODBARRA), lote, unidade e quantidade.
+5. O registro grava CODPROD, CONTROLE, CODVOL, CODBARRA, QTD, CODUSU, DHLEITURA e IDEVENTO.
+6. Nenhum item previsto e devolvido ao navegador. A versao nao finaliza nem compara leituras.
+
+ATENCAO: a primeira versao usa exclusivamente TGFPRO.CODBARRA. Se o seu codigo fisico estiver em outra tabela, sera necessario ajustar a resolucao. O campo unidade deve ser conferido fisicamente, nao inferido automaticamente. O controle de concorrencia depende de transacao EJB Required e do lock no cabecalho. O IDEVENTO evita repeticao de requisicao em condicoes normais, mas exige restricao UNIQUE para protecao forte contra concorrencia. Nao utilizar em producao sem validar essas premissas e os perfis de acesso.

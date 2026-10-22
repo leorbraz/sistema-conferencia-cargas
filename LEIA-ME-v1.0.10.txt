@@ -1,0 +1,26 @@
+CONFERENCIA CEGA DE CARGAS - V1.0.10
+
+Base: v1.0.3 com consulta OC e comunicacao Java comprovada em homologacao.
+
+NOVO: botao Validar Composicao FIFO, metodo ConferenciaCargaSP.consultarComposicao
+e servico ComposicaoRomaneioService.
+
+A consulta replica a demanda pendente, agrupamento por prefixo, local 71400000,
+saldo ESTOQUE-RESERVADO e a alocacao por intervalos acumulados FIFO do JRXML.
+Nao retorna produtos, lotes nem quantidades ao navegador.
+
+ATENCAO - VALIDACOES PENDENTES:
+1. O SQL do romaneio original nao filtra TIPMOV=P; esta versao preserva essa regra.
+2. Unidades diferentes por produto/prefixo impedem considerar a alocacao completa.
+3. O estoque pode mudar apos imprimir o romaneio: nao ha snapshot nesta versao.
+4. O botao nao libera a conferencia, nao grava previsao, nem modifica estoque.
+5. A quantidade de pedidos exibida pela consulta OC usa TIPMOV=P, conforme v1.0.3.
+6. Validar os resultados com o romaneio real em homologacao antes de avancar.
+
+PASSOS:
+1. Copiar o projeto para a pasta de trabalho.
+2. Executar .\gradlew clean gerarAddon
+3. Publicar e implantar em homologacao como na v1.0.3.
+4. Abrir empresa 53 / OC 230; Buscar Ordem de Carga.
+5. Clicar Validar Composicao FIFO.
+6. Se houver erro, enviar mensagem completa e log do servidor.

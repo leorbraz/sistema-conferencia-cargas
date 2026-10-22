@@ -1,0 +1,6 @@
+v1.0.55 - Validacao operacional simples da doca no layout estreito.
+Sem tabelas novas. A validacao e efetuada no Java consultando TGFORD.AD_DOCA.
+IMPORTANTE: o bloqueio de registro e de interface e somente no cliente.
+O endpoint legado registrarLeitura permanece acessivel diretamente sem prova de doca;
+nao usar como mecanismo de seguranca contra bypass.
+Desktop nao alterado.

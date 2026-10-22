@@ -1,0 +1,11 @@
+VERSAO 1.0.72 - CADASTRO NATIVO DE PERMISSOES (BASE DE HOMOLOGACAO)
+
+ATENCAO: NAO PUBLIQUE ANTES DE LIMPAR A ENTIDADE/TABELA ANTIGA PELO PROCEDIMENTO SUPORTADO PELO SANKHYA.
+O ZIP anterior nao contem permissoes.xml; este acrescenta o XML e o dynamicForm.
+Nao ha alteracao de Java ou interface de conferencia nesta versao.
+O controle operacional por perfil AINDA NAO ESTA IMPLEMENTADO neste pacote.
+O campo CODUSU usa targetInstance=Usuario, que precisa ser confirmado no ambiente.
+Antes de instalar, confirme que AD_CONF_CARGA_PERM nao existe e que metadados TDDTAB/TDDCAM antigos foram removidos por mecanismo suportado.
+Execute .\gradlew clean build e publique apenas em homologacao.
+Verifique a inicializacao da tela, pesquisa CODUSU e geracao automatica IDUSU.
+A unicidade de CODUSU deve ser garantida no banco apos criacao e validacao da tabela.

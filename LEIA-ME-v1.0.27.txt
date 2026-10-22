@@ -1,0 +1,15 @@
+v1.0.27 - Validacao administrativa (HOMOLOGACAO)
+Base: v1.0.26 testada.
+
+1. Execute INSTALACAO_V1.0.27.sql no schema onde estao as tabelas AD_CONF_CARGA*.
+2. Compile e publique: .\gradlew clean build; .\gradlew publishAddon deployAddon configureAddon processDashboards
+3. Teste uma conferencia O: Validar OK => V.
+4. Teste uma conferencia D: Validar com divergencias (justificativa obrigatoria) => X.
+5. Teste O ou D: Solicitar reconferencia (justificativa obrigatoria) => A.
+6. Confira AD_CONF_CARGA_ACAO; confirme que as leituras anteriores e previsao congelada permanecem.
+7. Confira que em V/X novas leituras/exclusoes continuam bloqueadas.
+
+ATENCAO: Controle de acesso por CODUSU ainda NAO implementado por decisao do projeto.
+Nao liberar em producao: aba de conciliacao e acoes administrativas estao disponiveis aos usuarios com acesso ao addon.
+A reconferencia retorna diretamente ao status A para aproveitar os servicos existentes.
+O historico de decisoes e gravado em AD_CONF_CARGA_ACAO.

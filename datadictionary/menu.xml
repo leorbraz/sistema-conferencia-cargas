@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+    <menu id="conferencia_cargas" description="Conferência de Cargas" icon="/$ctx/assets/icon.png">
+        <ui id="CONF_CARGAS" url="/$ctx/CONF_CARGAS.xhtml5" description="Conferência de Cargas"/>
+        <dynamicForm id="CONF_CARGAS_PERMISSOES" instance="AD_ConfCargaPerm" description="Permissoes de Conferencia de Cargas" resourceId="br.com.agronorte.conferenciacargas.permissoes"/>
+    </menu>
+</metadados>

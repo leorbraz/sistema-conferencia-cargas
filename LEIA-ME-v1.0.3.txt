@@ -1,0 +1,16 @@
+CONFERENCIA CEGA DE CARGAS - v1.0.3
+
+Base: v1.0.2.2, cujo servico Java funcionou no Sankhya.
+
+NOVO: ConferenciaCargaSP.consultarOC -> OrdemCargaService.
+Consulta somente leitura: existencia da OC em TGFORD e numero de documentos TIPMOV=P em TGFCAB.
+Nao consulta ainda o FIFO do romaneio, nao grava e nao devolve itens ou lotes.
+
+1. Extraia e copie os arquivos do projeto para sua pasta de desenvolvimento.
+2. Rode: .\gradlew clean gerarAddon
+3. Publique/deploy/configure conforme seu procedimento de homologacao.
+4. Abra a tela, informe empresa 53 e OC 230 e clique Buscar Ordem de Carga.
+5. O botao Testar Servico Java continua disponivel para diagnostico.
+
+NOTA: O endereco do service.sbr permanece relativo ao contexto do proprio Add-on.
+Caso a consulta falhe, envie a mensagem exibida e os logs do Gradle.

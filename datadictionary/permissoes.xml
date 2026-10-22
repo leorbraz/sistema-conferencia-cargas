@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA_PERM" sequenceType="A" sequenceField="IDUSU">
+    <description>Permissoes dos usuarios da Conferencia de Cargas</description>
+    <primaryKey><field name="IDUSU"/></primaryKey>
+    <instances><instance name="AD_ConfCargaPerm"><description>Permissoes de Conferencia de Cargas</description></instance></instances>
+    <fields>
+      <field name="IDUSU" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Identificador do cadastro</description></field>
+      <field name="CODUSU" dataType="PESQUISA" targetInstance="Usuario" targetField="CODUSU" targetType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Usuario do Sankhya</description></field>
+      <field name="PERFIL" dataType="LISTA" size="1" allowSearch="S" visibleOnSearch="S"><description>Perfil</description><fieldOptions><option value="C">Conferente</option><option value="S">Supervisor</option></fieldOptions></field>
+      <field name="ATIVO" dataType="LISTA" size="1" allowSearch="S" visibleOnSearch="S"><description>Ativo</description><fieldOptions><option value="S">Sim</option><option value="N">Nao</option></fieldOptions></field>
+    </fields>
+  </table>
+</metadados>

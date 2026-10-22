@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA" sequenceType="A" sequenceField="NUCONF">
+    <description>Conferencia Cega de Cargas</description>
+    <primaryKey><field name="NUCONF"/></primaryKey>
+    <instances><instance name="AD_ConfCarga"><description>Conferencia Cega de Cargas</description></instance></instances>
+    <fields>
+      <field name="NUCONF" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Numero da conferencia</description></field>
+      <field name="CODEMP" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Empresa</description></field>
+      <field name="ORDEMCARGA" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Ordem de carga</description></field>
+      <field name="STATUS" dataType="TEXTO" size="1" allowSearch="S" visibleOnSearch="S"><description>P preparacao, A ativa, O finalizada OK, D finalizada divergente, C concluida, X cancelada</description></field>
+      <field name="CODUSUABERT" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Usuario de abertura</description></field>
+      <field name="CODUSUFIN" dataType="INTEIRO" allowSearch="S" visibleOnSearch="S"><description>Usuario da finalizacao fisica</description></field>
+      <field name="DHFINALIZACAO" dataType="DATA_HORA" allowSearch="S" visibleOnSearch="S"><description>Data e hora da finalizacao fisica</description></field>
+      <field name="DIVERGENTE" dataType="TEXTO" size="1" allowSearch="S" visibleOnSearch="S"><description>Finalizada com divergencia S/N</description></field>
+      <field name="DHABERT" dataType="DATA_HORA" allowSearch="S" visibleOnSearch="S"><description>Data e hora de abertura</description></field>
+    </fields>
+  </table>
+</metadados>

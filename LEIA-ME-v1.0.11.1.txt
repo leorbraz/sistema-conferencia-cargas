@@ -1,0 +1,13 @@
+Conferencia Cega de Cargas v1.0.11.1 - Data Dictionary
+
+1. Esta versao usa autoDDL=true e os arquivos datadictionary/conferencia.xml e previsao.xml.
+2. Nao execute o antigo script manual 01_criar_tabelas_oracle.sql.
+3. Em homologacao: .\gradlew clean gerarAddon; publique, implante e configure o addon.
+4. Antes de iniciar, confirme AD_CONF_CARGA e AD_CONF_CARGA_PREV no schema correto.
+5. Teste empresa 53 / OC 230. A previsao permanece em status P.
+6. O numero NUCONF e NUPREV e gerado pelo servico via MAX+1 com bloqueio exclusivo
+   da tabela de cabecalho na transacao. Testar concorrencia e rollback antes de producao.
+7. O XML define estrutura e relacionamentos; indices unicos adicionais e validacao
+   administrativa da previsao ainda precisam ser implementados.
+8. IMPORTANTE: a consulta FIFO da v1.0.11 foi preservada; comparar os detalhes com
+   o romaneio impresso antes de permitir conferencias fisicas.

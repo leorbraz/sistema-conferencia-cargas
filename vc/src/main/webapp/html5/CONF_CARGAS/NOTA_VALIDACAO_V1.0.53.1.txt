@@ -1,0 +1,6 @@
+Correção de diagnóstico da interface v1.0.53.1.
+O código recebido já utiliza modal próprio em finalizarConferencia, decidirConferencia, iniciarConferencia e confirmarExclusao.
+Se o navegador continuar exibindo diálogo com IP e "diz", é código antigo em cache ou publicação antiga.
+Após publicar e recarregar, confira no rodapé "Interface 1.0.53.1".
+Se não aparecer, revisar publicação do dashboard e cache de recursos.
+Se aparecer e ainda houver diálogo nativo, registrar a ação e identificar outro script responsável.

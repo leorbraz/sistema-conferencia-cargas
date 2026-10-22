@@ -1,0 +1,22 @@
+Conferencia de Cargas - v1.0.26 (finalizacao fisica)
+
+ATENCAO: o ZIP recebido ja possuia build.gradle version=1.0.25. Por isso, a nova versao e 1.0.26 (nao 1.0.22).
+
+Mudancas:
+- Botao Finalizar Conferencia na aba Conferencia; confirmacao OK ou divergente sem detalhes de previsao.
+- Estados O (finalizada OK) e D (finalizada divergente).
+- Registro CODUSUFIN, DHFINALIZACAO e DIVERGENTE na AD_CONF_CARGA.
+- Bloqueio transacional de leituras/exclusoes apos finalizar; consultas de painel permanecem disponiveis.
+- Comparacao por CODPROD, CONTROLE, CODVOL; apenas leituras ativas.
+- Controle de acesso administrativo NAO incluido nesta versao. A aba Conciliacao continua visivel, como no ZIP original.
+
+Banco: verificar se as colunas existem; se nao, executar SQL_v1.0.22_conferencia.sql ANTES de usar a nova rotina.
+Como autoDDL=true, validar tambem o comportamento da atualizacao de metadados no ambiente Sankhya.
+
+Build/deploy na homologacao (Windows):
+  .\gradlew clean build
+  .\gradlew publishAddon deployAddon configureAddon processDashboards
+
+Teste: abrir conferencia A com leitura, clicar Finalizar, testar Cancelar; testar Confirmar, verificar status O/D e bloqueio de novas leituras.
+
+Validacao pendente: build Java/Sankhya e testes no banco de homologacao nao foram executados neste ambiente.

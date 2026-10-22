@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadados xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../.gradle/metadados.xsd">
+  <table name="AD_CONF_CARGA_HIST" sequenceType="A" sequenceField="NUHIST">
+    <description>Auditoria das leituras de conferencia de cargas</description>
+    <primaryKey><field name="NUHIST"/></primaryKey>
+    <instances><instance name="AD_ConfCargaHist"><description>Historico da conferencia</description></instance></instances>
+    <fields>
+      <field name="NUHIST" dataType="INTEIRO"><description>Identificador do historico</description></field>
+      <field name="NUCONF" dataType="PESQUISA" targetInstance="AD_ConfCarga" targetField="NUCONF" targetType="INTEIRO"><description>Conferencia</description></field>
+      <field name="NULEIT" dataType="INTEIRO"><description>Identificador da leitura</description></field>
+      <field name="ACAO" dataType="TEXTO" size="20"><description>INCLUSAO ou EXCLUSAO</description></field>
+      <field name="CODPROD" dataType="INTEIRO"><description>Produto</description></field>
+      <field name="CONTROLE" dataType="TEXTO" size="100"><description>Lote fisico</description></field>
+      <field name="CODVOL" dataType="TEXTO" size="20"><description>Unidade</description></field>
+      <field name="QTD" dataType="DECIMAL" nuCasasDecimais="8"><description>Quantidade da leitura</description></field>
+      <field name="CODUSU" dataType="INTEIRO"><description>Usuario responsavel</description></field>
+      <field name="DHEVENTO" dataType="DATA_HORA"><description>Data e hora do evento</description></field>
+      <field name="MOTIVO" dataType="TEXTO" size="500"><description>Motivo da exclusao</description></field>
+    </fields>
+  </table>
+</metadados>

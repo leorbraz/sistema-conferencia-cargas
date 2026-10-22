@@ -1,0 +1,4 @@
+v1.0.21 - Inicio automatico em STATUS=A apos congelamento FIFO completo.
+O cabecalho e criado P durante a transacao e atualizado para A somente apos todas as previsoes serem gravadas.
+Requer build e deploy; nenhuma alteracao de banco.
+Conferencias antigas com P nao sao liberadas automaticamente.

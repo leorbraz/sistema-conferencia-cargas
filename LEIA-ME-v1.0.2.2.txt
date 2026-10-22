@@ -1,0 +1,9 @@
+VERSAO 1.0.2.2 - TESTE DE CONTEXTO DO SERVICO
+
+Ajuste exclusivo no frontend: troca /mge/service.sbr pelo service.sbr relativo ao contexto web do Add-on.
+Envia corpo JSON com serviceName e requestBody, como no Controle de Ensacamento.
+Inclui mgeSession quando presente na URL.
+Nenhuma mudanca no EJB, SQL, banco de dados ou romaneio.
+
+Teste: gradlew clean gerarAddon, publicar e implantar na homologacao, clicar Testar Servico Java.
+Se o erro persistir, conferir no F12 a Request URL: deve apontar para o contexto do Add-on, e nao /mge/service.sbr.

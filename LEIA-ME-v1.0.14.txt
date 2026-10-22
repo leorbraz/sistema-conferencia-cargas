@@ -1,0 +1,12 @@
+Versao 1.0.14 - Painel parcialmente cego do conferente
+
+Base: v1.0.13.
+Novo servico: ConferenciaCargaSP.consultarPainelConferente (NUCONF).
+Retorna somente produtos distintos previstos (codigo, descricao, referencia, comLeitura) e leituras efetivamente realizadas agrupadas por produto/lote/unidade.
+Nao retorna CONTROLE ou QTD_PREV da AD_CONF_CARGA_PREV.
+Exige STATUS=A; nenhum dado de conciliacao e exposto.
+Interface: botao Carregar/atualizar listas, cards dos produtos, tabela das leituras. Atualiza automaticamente apos leitura bem-sucedida.
+Leituras individuais e idempotencia preservadas.
+
+ATENCAO: ainda nao ha permissao por perfil; nao publicar servico administrativo de conciliacao sem protecao.
+Validar compilacao, publicacao e testes na homologacao Sankhya.
