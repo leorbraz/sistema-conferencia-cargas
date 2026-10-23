@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 /** Registro fisico: nenhuma quantidade prevista e enviada ao navegador. */
 public class LeituraConferenciaService {
     public JsonObject registrar(BigDecimal nuconf, String barra, String lote, BigDecimal qtd,
-                                String unidade, String evento, BigDecimal usuario) throws Exception {
+                                String unidade, String evento, BigDecimal usuario, boolean confirmarLote) throws Exception {
         if (nuconf == null || nuconf.signum() <= 0 || nuconf.stripTrailingZeros().scale() > 0 ||
             barra == null || barra.trim().isEmpty() || barra.length() > 100 ||
             lote == null || lote.trim().isEmpty() || lote.length() > 100 ||
@@ -59,6 +59,29 @@ public class LeituraConferenciaService {
                 produto = rs.getBigDecimal(1);
                 if (rs.next()) throw new Exception("Codigo de barras ambiguo: mais de um produto.");
             } finally { close(rs,sql); }
+            // Bloqueia produto inexistente na previsao congelada, sem revelar quantidades.
+            sql = new NativeSql(jdbc); rs = null;
+            try {
+                sql.appendSql("SELECT COUNT(*) FROM AD_CONF_CARGA_PREV WHERE NUCONF=:N AND CODPROD=:P");
+                sql.setNamedParameter("N", nuconf); sql.setNamedParameter("P", produto);
+                rs = sql.executeQuery();
+                if (!rs.next() || rs.getInt(1) == 0)
+                    throw new Exception("Produto nao previsto na Ordem de Carga. Leitura nao registrada.");
+            } finally { close(rs, sql); }
+            // Lote divergente exige confirmacao expressa, mas pode ser registrado.
+            sql = new NativeSql(jdbc); rs = null;
+            try {
+                sql.appendSql("SELECT COUNT(*) FROM AD_CONF_CARGA_PREV WHERE NUCONF=:N AND CODPROD=:P AND CONTROLE=:L");
+                sql.setNamedParameter("N", nuconf); sql.setNamedParameter("P", produto);
+                sql.setNamedParameter("L", lote);
+                rs = sql.executeQuery();
+                if ((!rs.next() || rs.getInt(1) == 0) && !confirmarLote) {
+                    JsonObject aviso = new JsonObject();
+                    aviso.addProperty("avisoLote", true);
+                    aviso.addProperty("mensagem", "Lote diferente do previsto para este produto. Deseja registrar mesmo assim?");
+                    return aviso;
+                }
+            } finally { close(rs, sql); }
             // Na reconferencia, nao permitir bipagem de produto que permaneceu conforme.
             sql = new NativeSql(jdbc); rs = null;
             try {

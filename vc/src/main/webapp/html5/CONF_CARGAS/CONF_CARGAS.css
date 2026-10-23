@@ -643,3 +643,17 @@
     font-size: 14px !important;
   }
 }
+
+/* v1.0.76: avisos operacionais destacados no coletor Zebra. */
+.conf-app-dialog:has(.conf-app-dialog-symbol.perigo){border:2px solid #b91c1c}
+.conf-app-dialog-head:has(.conf-app-dialog-symbol.perigo){background:#fff0f0;color:#991b1b;border-bottom-color:#fecaca}
+.conf-app-dialog-symbol.perigo{background:#b91c1c;color:#fff;width:34px;height:34px;font-size:22px}
+@media (max-width:700px){
+  .conf-app-dialog-backdrop{padding:12px;background:rgba(15,23,42,.68)}
+  .conf-app-dialog{width:100%;max-width:440px;border-radius:13px}
+  .conf-app-dialog-head{padding:18px;font-size:20px;line-height:1.25}
+  .conf-app-dialog-body{padding:20px 18px;font-size:17px;line-height:1.5}
+  .conf-app-dialog-actions{padding:14px 18px 20px;gap:10px;flex-wrap:wrap}
+  .conf-app-dialog-actions .conf-btn{min-height:52px;font-size:16px;flex:1 1 auto}
+  .conf-app-dialog-symbol.perigo{width:40px;height:40px;font-size:26px;flex-shrink:0}
+}

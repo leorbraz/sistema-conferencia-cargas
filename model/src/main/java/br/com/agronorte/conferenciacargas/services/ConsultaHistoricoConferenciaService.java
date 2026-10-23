@@ -26,7 +26,11 @@ public class ConsultaHistoricoConferenciaService {
             try {
                 sql.appendSql("SELECT DATA_EVENTO,CODUSU,ACAO,DETALHES FROM (" +
                     "SELECT DHACAO DATA_EVENTO,CODUSU,ACAO, " +
-                    "SUBSTR('Status: '||NVL(STATUS_ANT,'-')||' -> '||NVL(STATUS_NOVO,'-')||" +
+                    "SUBSTR('Status: '||(" +
+                    "CASE STATUS_ANT WHEN 'P' THEN 'Preparação' WHEN 'A' THEN 'Em Conferência' WHEN 'O' THEN 'Finalizada OK' WHEN 'D' THEN 'Finalizada Divergente' WHEN 'V' THEN 'Validada' WHEN 'X' THEN 'Validada Divergente' ELSE NVL(STATUS_ANT,'Não informado') END" +
+                    ")||' -> '||(" +
+                    "CASE STATUS_NOVO WHEN 'P' THEN 'Preparação' WHEN 'A' THEN 'Em Conferência' WHEN 'O' THEN 'Finalizada OK' WHEN 'D' THEN 'Finalizada Divergente' WHEN 'V' THEN 'Validada' WHEN 'X' THEN 'Validada Divergente' ELSE NVL(STATUS_NOVO,'Não informado') END" +
+                    ")||" +
                     "CASE WHEN JUSTIFICATIVA IS NOT NULL THEN ' | '||JUSTIFICATIVA ELSE '' END,1,1000) DETALHES " +
                     "FROM AD_CONF_CARGA_ACAO WHERE NUCONF=:N " +
                     "UNION ALL SELECT DHEVENTO DATA_EVENTO,CODUSU,ACAO, " +

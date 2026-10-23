@@ -2,6 +2,18 @@ angular.module('CONF_CARGASApp', ['snk'])
   .controller('CONF_CARGASController', ['$scope', function ($scope) {
     var self = this;
     self.versaoInterface = "1.0.60.1-doca-foco-fullscreen";
+    self.perfilConferencia = null;
+    self.perfilCarregado = false;
+    self.ehSupervisor = function(){return self.perfilCarregado && self.perfilConferencia === 'S';};
+    self.temPerfilConferencia = function(){return self.perfilCarregado && (self.perfilConferencia === 'S' || self.perfilConferencia === 'C');};
+    self.carregarPerfilConferencia = function(){
+      return self.requisicaoLeitura('consultarPerfilConferencia',{}).then(function(d){
+        $scope.$applyAsync(function(){self.perfilConferencia=d.perfil;self.perfilCarregado=true;});
+      }).catch(function(err){
+        $scope.$applyAsync(function(){self.perfilConferencia=null;self.perfilCarregado=true;self.mensagemBusca='Não foi possível consultar o perfil da conferência: '+(err.message||err);});
+      });
+    };
+
     // v1.0.58: teste de tela cheia via gesto do operador (Chrome/Android).
     // Pode ser bloqueado quando a personalizacao esta em iframe sem permissao fullscreen.
     self.alternarTelaCheia = function () {
@@ -40,7 +52,7 @@ angular.module('CONF_CARGASApp', ['snk'])
       return new Promise(function(resolve){
         $scope.$applyAsync(function(){
           self.dialogo={titulo:opcoes.titulo||'Confirmacao',mensagem:opcoes.mensagem||'',
-            tipo:opcoes.tipo||'confirmacao',rotulo:opcoes.rotulo||'Confirmar',
+            tipo:opcoes.tipo||'confirmacao',rotulo:opcoes.rotulo||'Confirmar',rotuloCancelar:opcoes.rotuloCancelar||'Cancelar',somenteAviso:!!opcoes.somenteAviso,
             exigeJustificativa:!!opcoes.exigeJustificativa,justificativa:'',erro:'',resolver:resolve};
         });
       });
@@ -58,6 +70,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.eventosHistorico=[];
     self.mensagemHistorico='';
     self.consultarHistorico=function(){
+      if(!self.ehSupervisor()){self.eventosHistorico=[];self.mensagemHistorico='';return;}
       if(!self.numeroConferencia){self.eventosHistorico=[];self.mensagemHistorico='Nenhuma conferencia selecionada.';return;}
       var n=Number(self.numeroConferencia);
       self.mensagemHistorico='Carregando historico...';
@@ -129,6 +142,21 @@ angular.module('CONF_CARGASApp', ['snk'])
           self.mensagemFinalizacao=result.mensagem+' Aguardando validacao administrativa.';
           self.linhaSelecionada=null;
           self.consultarPainel();
+          self.abrirDialogo({titulo:'Conferência finalizada!',mensagem:result.status==='D'?'Contagem finalizada com divergências. Aguarde a validação do Supervisor. A mercadoria ainda não está liberada para carregamento.':'Contagem concluída com sucesso. Aguarde a validação do Supervisor. A mercadoria ainda não está liberada para carregamento.',tipo:result.status==='D'?'alerta':'confirmacao',rotulo:'OK',somenteAviso:true})
+            .then(function(){
+              // Somente no coletor, apos o operador confirmar o aviso de sucesso.
+              if(!self.ehLayoutColetor())return;
+              $scope.$applyAsync(function(){
+                self.voltarFila();
+                self.filtroOcFila='';
+                self.ordemCarga=null;
+                self.numeroConferencia=null;
+                self.doca=null;
+                self.docaValidada=false;
+                self.barraLeitura='';self.loteLeitura='';self.unidadeLeitura='';
+                self.mensagemLeitura='';self.mensagemFinalizacao='';
+              });
+            });
         });})
         .catch(function(err){$scope.$applyAsync(function(){self.mensagemFinalizacao='Erro: '+err.message;});})
         .finally(function(){$scope.$applyAsync(function(){self.finalizandoConferencia=false;});});
@@ -136,6 +164,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.acaoAdministrativaEmAndamento=false;
     self.mensagemAdministrativa='';
     self.decidirConferencia=function(acao){
+      if(!self.ehSupervisor())return;
       if(self.acaoAdministrativaEmAndamento || !self.numeroConferencia || ['O','D'].indexOf(self.statusCodigo)<0)return;
       var n=Number(self.numeroConferencia);
       if(acao==='VALIDAR' && self.statusCodigo!=='O')return;
@@ -165,6 +194,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.mensagemConciliacao='';
     self.filtroConciliacao='';
     self.consultarConciliacao=function(){
+      if(!self.ehSupervisor())return;
       if(!self.numeroConferencia){self.mensagemConciliacao='Busque uma conferencia antes de conciliar.';return;}
       if(self.consultandoConciliacao)return;
       var n=Number(self.numeroConferencia);
@@ -176,7 +206,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     };
     self.preparandoInicio=false;
     self.ocLocalizadaParaInicio=false;
-    self.podeIniciarConferencia=function(){return self.ocLocalizadaParaInicio && !self.numeroConferencia && !self.resultadoCongelamento && !self.buscandoConferencia;};
+    self.podeIniciarConferencia=function(){return self.ehSupervisor() && self.ocLocalizadaParaInicio && !self.numeroConferencia && !self.resultadoCongelamento && !self.buscandoConferencia;};
     self.iniciarPelaBusca=function(){
       if(!self.podeIniciarConferencia() || self.preparandoInicio)return;
       var e=Number(self.empresa),o=Number(self.ordemCarga);
@@ -297,6 +327,19 @@ angular.module('CONF_CARGASApp', ['snk'])
         .then(function(r){$scope.$applyAsync(function(){
           var ordem=(r.ordens||[]).filter(function(l){return Number(l.empresa)===empresa&&Number(l.ordem)===oc;})[0];
           if(!ordem){self.mensagemSelecaoColetor='Ordem de Carga não encontrada para a empresa informada.';return;}
+          // v1.0.79: nao permitir reabrir no coletor conferencias finalizadas/validadas.
+          // A fila devolve o status da ultima conferencia da OC, inclusive as historicas.
+          var statusOc=String(ordem.status||'N').trim().toUpperCase();
+          var avisosStatus={
+            O:{titulo:'Conferência já finalizada!',mensagem:'Esta Ordem de Carga já foi conferida e finalizada. Aguarde a validação do Supervisor antes de realizar outra conferência.'},
+            D:{titulo:'Conferência finalizada com divergência!',mensagem:'Esta Ordem de Carga já foi conferida com divergência e aguarda decisão do Supervisor. Somente uma reconferência autorizada permite nova leitura.'},
+            V:{titulo:'Ordem de Carga já conferida!',mensagem:'Esta Ordem de Carga já foi finalizada e validada pelo Supervisor. Não é necessário realizar uma nova conferência.'},
+            X:{titulo:'Ordem de Carga já conferida!',mensagem:'Esta Ordem de Carga já foi finalizada e validada com divergência pelo Supervisor. Não é necessário realizar uma nova conferência.'}
+          };
+          if(avisosStatus[statusOc]){
+            self.abrirDialogo({titulo:avisosStatus[statusOc].titulo,mensagem:avisosStatus[statusOc].mensagem,tipo:'perigo',rotulo:'OK — Entendi',somenteAviso:true});
+            return;
+          }
           if(ordem.doca===null||ordem.doca===undefined||String(ordem.doca).trim()===''){
             self.mensagemSelecaoColetor='A Ordem de Carga não possui doca cadastrada.';return;
           }
@@ -543,6 +586,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.consultandoFIFO = false;
     self.resultadoFIFO = null;
     self.consultarFIFO = function () {
+      if(!self.ehSupervisor())return;
       var empresa = Number(self.empresa), ordem = Number(self.ordemCarga);
       if (!Number.isSafeInteger(empresa) || empresa <= 0 ||
           !Number.isSafeInteger(ordem) || ordem <= 0) {
@@ -601,6 +645,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.congelando = false;
     self.resultadoCongelamento = null;
     self.iniciarConferencia = function () {
+      if(!self.ehSupervisor())return;
       var empresa = Number(self.empresa), ordem = Number(self.ordemCarga);
       if (!self.resultadoOC || !self.resultadoOC.encontrada ||
           Number(self.resultadoOC.empresa) !== empresa ||
@@ -683,12 +728,37 @@ angular.module('CONF_CARGASApp', ['snk'])
     // caracteres para evitar mover o foco durante a leitura.
     var temporizadorBarra = null;
     var ultimaAlteracaoBarra = 0;
+    var codigoAnteriorBarra = '';
+    var apagandoCodigoBarra = false;
+    var suspenderAvancoBarraAte = 0;
+    self.onCodigoBarrasKeydown = function(evento){
+      if(self.ehLayoutColetor() && (evento.key==='Backspace'||evento.key==='Delete'||evento.keyCode===8||evento.keyCode===46)){
+        apagandoCodigoBarra=true;
+        suspenderAvancoBarraAte=Date.now()+650;
+        ++ultimaAlteracaoBarra;
+        if(temporizadorBarra){clearTimeout(temporizadorBarra);temporizadorBarra=null;}
+      }
+      self.avancarLeitura(evento,'barra');
+    };
+    self.onCodigoBarrasKeyup = function(evento){
+      if(evento.key==='Backspace'||evento.key==='Delete'||evento.keyCode===8||evento.keyCode===46){
+        apagandoCodigoBarra=false;
+        suspenderAvancoBarraAte=Date.now()+650;
+      }
+    };
     self.aoAlterarCodigoBarras = function () {
       if (temporizadorBarra) { clearTimeout(temporizadorBarra); temporizadorBarra = null; }
+      var codigoAtual=String(self.barraLeitura||'');
+      var reduziuCodigo=codigoAtual.length<codigoAnteriorBarra.length;
+      codigoAnteriorBarra=codigoAtual;
+      if(reduziuCodigo){
+        ++ultimaAlteracaoBarra;
+        suspenderAvancoBarraAte=Date.now()+650;
+      }
       // Consulta da unidade em ambos os layouts; somente o avanco de foco e exclusivo do coletor.
       if (self.precisaValidarDoca() || self.registrandoLeitura || self.statusCodigo !== 'A') return;
       self.consultarUnidadePadrao();
-      if (!self.ehLayoutColetor()) return;
+      if (!self.ehLayoutColetor() || apagandoCodigoBarra || reduziuCodigo || Date.now()<suspenderAvancoBarraAte) return;
       var codigo = String(self.barraLeitura || '').trim();
       // Codigos muito curtos nao disparam mudanca automatica acidental.
       if (codigo.length < 4) return;
@@ -696,7 +766,7 @@ angular.module('CONF_CARGASApp', ['snk'])
       var alteracaoAtual = ultimaAlteracaoBarra;
       temporizadorBarra = setTimeout(function () {
         temporizadorBarra = null;
-        if (alteracaoAtual !== ultimaAlteracaoBarra || !self.ehLayoutColetor()) return;
+        if (alteracaoAtual !== ultimaAlteracaoBarra || !self.ehLayoutColetor() || apagandoCodigoBarra || Date.now()<suspenderAvancoBarraAte) return;
         var campo = document.getElementById('conf-codigo-barras');
         var lote = document.getElementById('conf-lote-fisico');
         if (campo && lote && document.activeElement === campo &&
@@ -838,7 +908,7 @@ angular.module('CONF_CARGASApp', ['snk'])
     self.mensagemLeitura = '';
     self.totalLeiturasSessao = 0;
     self.eventoPendente = null;
-    self.registrarLeitura = function () {
+    self.registrarLeitura = function (confirmarLote) {
       if (self.precisaValidarDoca()) { self.mensagemLeitura='Valide a doca antes de registrar leituras.'; return; }
       var n = Number(self.numeroConferencia), q = Number(self.quantidadeLeitura);
       var barra = String(self.barraLeitura || '').trim();
@@ -853,7 +923,7 @@ angular.module('CONF_CARGASApp', ['snk'])
       if (!self.eventoPendente) {
         self.eventoPendente = 'CONF-' + Date.now() + '-' + Math.random().toString(36).slice(2);
       }
-      var payload = {NUCONF:n,CODBARRA:barra,CONTROLE:lote,CODVOL:unidade,QTD:q,IDEVENTO:self.eventoPendente};
+      var payload = {NUCONF:n,CODBARRA:barra,CONTROLE:lote,CODVOL:unidade,QTD:q,IDEVENTO:self.eventoPendente,CONFIRMAR_LOTE:confirmarLote===true?'S':'N'};
       var url = new URL('service.sbr',window.location.href);
       url.searchParams.set('serviceName','ConferenciaCargaSP.registrarLeitura');
       url.searchParams.set('outputType','json');
@@ -873,6 +943,13 @@ angular.module('CONF_CARGASApp', ['snk'])
         var result=data.responseBody||{};
         if(typeof result==='string') result=JSON.parse(result);
         if(result.responseBody) result=result.responseBody;
+        if(result.avisoLote){
+          self.registrandoLeitura=false;
+          return self.abrirDialogo({titulo:'Lote divergente!',mensagem:'O lote informado nao corresponde ao previsto para este produto. Deseja registrar mesmo assim? O Supervisor analisara a divergencia.',tipo:'perigo',rotulo:'Registrar mesmo assim',rotuloCancelar:'Corrigir lote'}).then(function(ok){
+            if(ok) self.registrarLeitura(true);
+            else $scope.$applyAsync(function(){self.mensagemLeitura='Registro cancelado. Corrija o lote e tente novamente.';});
+          });
+        }
         if(!result.numeroLeitura) throw new Error('Resposta inesperada: '+JSON.stringify(data).substring(0,250));
         $scope.$applyAsync(function(){
           self.mensagemLeitura=result.mensagem+' Nº '+result.numeroLeitura;
@@ -884,6 +961,12 @@ angular.module('CONF_CARGASApp', ['snk'])
           self.focarCodigoBarras();
         });
       }).catch(function(err){$scope.$applyAsync(function(){self.mensagemLeitura='Erro: '+err.message+' (reenvio conserva identificador)';});
+        if(self.ehLayoutColetor()){
+          var mensagem=String(err && err.message || 'Falha ao registrar a leitura.');
+          var produtoFora=/n[aã]o previsto|fora da (oc|ordem)|n[aã]o pertence|produto.*(ordem|carga)/i.test(mensagem);
+          var barraInvalida=/c[oó]digo de barras|codbarr|refer[eê]ncia|produto n[aã]o encontrad|barra inv[aá]lid/i.test(mensagem);
+          self.abrirDialogo({titulo:produtoFora?'Produto não previsto na OC!':(barraInvalida?'Código de barras inválido!':'Erro ao registrar leitura'),mensagem:mensagem+'\n\nLeitura não registrada.',tipo:'perigo',rotulo:'OK',somenteAviso:true}).then(function(){self.focarCodigoBarras();});
+        }
       }).finally(function(){$scope.$applyAsync(function(){self.registrandoLeitura=false;});});
     };
 
@@ -931,4 +1014,5 @@ angular.module('CONF_CARGASApp', ['snk'])
       }).finally(function(){$scope.$applyAsync(function(){self.consultandoPainel=false;});});
     };
 
+    $scope.$evalAsync(function(){self.carregarPerfilConferencia();});
   }]);

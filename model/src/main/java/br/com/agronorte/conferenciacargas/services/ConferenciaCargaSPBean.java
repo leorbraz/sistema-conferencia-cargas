@@ -23,6 +23,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void buscarConferencia(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal empresa = ctx.getParameterAsBigDecimal("CODEMP");
             BigDecimal ordem = ctx.getParameterAsBigDecimal("ORDEMCARGA");
@@ -42,6 +43,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarUnidadeProduto(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             String barra = ctx.getParameterAsString("CODBARRA");
             ctx.setJsonResponse(new UnidadeProdutoService().consultar(barra));
@@ -59,6 +61,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void validarDoca(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal empresa = ctx.getParameterAsBigDecimal("CODEMP");
             BigDecimal ordem = ctx.getParameterAsBigDecimal("ORDEMCARGA");
@@ -89,6 +92,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarOC(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         BigDecimal empresa = ctx.getParameterAsBigDecimal("CODEMP");
         BigDecimal ordem = ctx.getParameterAsBigDecimal("ORDEMCARGA");
         try {
@@ -106,6 +110,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarComposicao(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         BigDecimal empresa = ctx.getParameterAsBigDecimal("CODEMP");
         BigDecimal ordem = ctx.getParameterAsBigDecimal("ORDEMCARGA");
         try {
@@ -125,6 +130,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Required"
      */
     public void iniciarConferencia(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         try {
             BigDecimal empresa = ctx.getParameterAsBigDecimal("CODEMP");
             BigDecimal ordem = ctx.getParameterAsBigDecimal("ORDEMCARGA");
@@ -145,6 +151,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Required"
      */
     public void registrarLeitura(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
         String barra = ctx.getParameterAsString("CODBARRA");
         String lote = ctx.getParameterAsString("CONTROLE");
@@ -153,7 +160,7 @@ public class ConferenciaCargaSPBean
         BigDecimal qtd = ctx.getParameterAsBigDecimal("QTD");
         BigDecimal usuario = br.com.sankhya.modelcore.auth.AuthenticationInfo.getCurrent().getUserID();
         try {
-            ctx.setJsonResponse(new LeituraConferenciaService().registrar(nuconf,barra,lote,qtd,unidade,evento,usuario));
+            ctx.setJsonResponse(new LeituraConferenciaService().registrar(nuconf,barra,lote,qtd,unidade,evento,usuario,"S".equals(ctx.getParameterAsString("CONFIRMAR_LOTE"))));
             ctx.setStatus(ServiceContext.STATUS_OK);
             ctx.setStatusMessage("Leitura processada.");
         } catch (Exception e) {
@@ -168,6 +175,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarPainelConferente(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             ctx.setJsonResponse(new ConsultaConferenteService().consultar(nuconf));
@@ -186,6 +194,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarConciliacao(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             ctx.setJsonResponse(new ConciliacaoConferenciaService().consultar(nuconf));
@@ -201,6 +210,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void listarLeiturasIndividuais(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             BigDecimal produto = ctx.getParameterAsBigDecimal("CODPROD");
@@ -219,6 +229,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Required"
      */
     public void excluirLeitura(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             BigDecimal nuleit = ctx.getParameterAsBigDecimal("NULEIT");
@@ -237,6 +248,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Supports"
      */
     public void consultarHistorico(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             ctx.setJsonResponse(new ConsultaHistoricoConferenciaService().consultar(nuconf));
@@ -253,6 +265,7 @@ public class ConferenciaCargaSPBean
      * @ejb.transaction type="Required"
      */
     public void finalizarConferencia(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirOperador();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             boolean confirmar = "S".equals(ctx.getParameterAsString("CONFIRMAR"));
@@ -266,11 +279,12 @@ public class ConferenciaCargaSPBean
     }
 
     /**
-     * Acoes administrativas em homologacao; controle por CODUSU sera aplicado antes da producao.
+     * Acoes administrativas restritas ao perfil Supervisor.
      * @ejb.interface-method view-type="remote"
      * @ejb.transaction type="Required"
      */
     public void decidirConferencia(ServiceContext ctx) throws Exception {
+        PermissaoConferenciaService.exigirSupervisor();
         try {
             BigDecimal nuconf = ctx.getParameterAsBigDecimal("NUCONF");
             String acao = ctx.getParameterAsString("ACAO");
@@ -283,6 +297,24 @@ public class ConferenciaCargaSPBean
         }
     }
 
+
+    /**
+     * Perfil da sessao autenticada; nunca recebe CODUSU do cliente.
+     * @ejb.interface-method view-type="remote"
+     * @ejb.transaction type="Supports"
+     */
+    public void consultarPerfilConferencia(ServiceContext ctx) throws Exception {
+        try {
+            String perfil = PermissaoConferenciaService.perfilAtual();
+            com.google.gson.JsonObject out = new com.google.gson.JsonObject();
+            out.addProperty("perfil", perfil);
+            ctx.setJsonResponse(out);
+            ctx.setStatus(ServiceContext.STATUS_OK);
+        } catch (Exception e) {
+            ctx.setStatus(ServiceContext.STATUS_ERROR);
+            ctx.setStatusMessage(e.getMessage());
+        }
+    }
 
     /**
      * Corrige apenas a dupla interpretacao UTF-8 -> Windows-1252 que pode ocorrer
